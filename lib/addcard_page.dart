@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:full_retrofit/bank_card.dart';
+import 'package:full_retrofit/card_page.dart';
 import 'package:full_retrofit/repository.dart';
 import 'package:full_retrofit/util.dart';
 import 'package:gap/gap.dart';
@@ -36,8 +37,18 @@ class _AddCardPageState extends State<AddCardPage> {
     final card = BankCard(
       id: null,
       holderName: _holderName.text,
+      bankName: _bankName.text,
+      number: int.parse(_cardNumber.text),
+      expireDate: _holderName.text,
+      cvv: int.parse(_cvv.text),
     );
     _repo.createCard(card).then((value) {
+      if(value) {
+        Navigator.of(context)
+            .pushAndRemoveUntil(MaterialPageRoute(builder: (context) => const CardPage()), (route) => false);
+      } else {
+        showError(context, "Error");
+      }
     });
   }
 
@@ -56,10 +67,11 @@ class _AddCardPageState extends State<AddCardPage> {
         child: ListView(
           children: [
             _card(),
-            const Gap(10),
+            const Gap(20),
             const Text("Bank name"),
-            const Gap(5),
+            const Gap(10),
             CupertinoTextField(
+              padding: const EdgeInsets.all(16),
               onChanged: (v) => setState(() {}),
               controller: _bankName,
               style: const TextStyle(
@@ -67,10 +79,22 @@ class _AddCardPageState extends State<AddCardPage> {
               ),
               maxLength: 16,
             ),
-            const Gap(5),
-            const Text("Card Number"),
-            const Gap(5),
+            const Gap(10),
+            const Text("Holder name"),
+            const Gap(10),
             CupertinoTextField(
+              padding: const EdgeInsets.all(16),
+              onChanged: (v) => setState(() {}),
+              controller: _holderName,
+              style: const TextStyle(
+                  color: Colors.white
+              ),
+            ),
+            const Gap(10),
+            const Text("Card Number"),
+            const Gap(10),
+            CupertinoTextField(
+              padding: const EdgeInsets.all(16),
               onChanged: (v) => setState(() {}),
               controller: _cardNumber,
               style: const TextStyle(
@@ -82,7 +106,7 @@ class _AddCardPageState extends State<AddCardPage> {
                 FilteringTextInputFormatter.digitsOnly
               ],
             ),
-            const Gap(5),
+            const Gap(10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -94,16 +118,52 @@ class _AddCardPageState extends State<AddCardPage> {
                 ),
               ],
             ),
-            const Gap(5),
+            const Gap(10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Expanded(child: CupertinoTextField()),
+                Expanded(child: CupertinoTextField(
+                  padding: const EdgeInsets.all(16),
+                  onChanged: (v) => setState(() {}),
+                  controller: _expDate1,
+                  style: const TextStyle(
+                      color: Colors.white
+                  ),
+                  maxLength: 2,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly
+                  ],
+                )),
                 const Gap(5),
-                Expanded(child: CupertinoTextField()),
+                Expanded(child: CupertinoTextField(
+                  padding: const EdgeInsets.all(16),
+                  onChanged: (v) => setState(() {}),
+                  controller: _expDate2,
+                  style: const TextStyle(
+                      color: Colors.white
+                  ),
+                  maxLength: 2,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly
+                  ],
+                )),
                 const Gap(5),
-                Expanded(child: CupertinoTextField()),
+                Expanded(child: CupertinoTextField(
+                  padding: const EdgeInsets.all(16),
+                  onChanged: (v) => setState(() {}),
+                  controller: _cvv,
+                  style: const TextStyle(
+                      color: Colors.white
+                  ),
+                  maxLength: 3,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly
+                  ],
+                )),
               ],
             ),
           ],
@@ -114,8 +174,11 @@ class _AddCardPageState extends State<AddCardPage> {
         child: SizedBox(
           height: 50,
           child: ElevatedButton(
-            onPressed: () {},
+            onPressed: _create,
             child: const Text("Create"),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: _color
+            ),
           ),
         ),
       ),
